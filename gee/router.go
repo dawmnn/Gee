@@ -38,7 +38,6 @@ func parsePattern(pattern string) []string {
 
 func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 	parts := parsePattern(pattern)
-
 	key := method + "-" + pattern
 	_, ok := r.roots[method]
 	if !ok {
