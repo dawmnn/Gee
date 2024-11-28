@@ -7,7 +7,7 @@ import (
 
 func main() {
 	r := gee.Default()
-
+	r.Use()
 	r.GET("/", func(c *gee.Context) {
 		c.String(http.StatusOK, "Hello Geektutu\n")
 	})

@@ -107,8 +107,14 @@ func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 // create static handler
 func (group *RouterGroup) createStaticHandler(relativePath string, fs http.FileSystem) HandlerFunc {
 	absolutePath := path.Join(group.prefix, relativePath)
-	fileServer := http.StripPrefix(absolutePath, http.FileServer(fs)) //访问 /assets/image.png 时，http.StripPrefix 会去掉 /assets，
+	fileServer := http.StripPrefix(absolutePath, http.FileServer(fs)) //访问 /assets/image.png 时，
+	// http.StripPrefix 会去掉 /assets，
 	// 然后 http.FileServer 会去 /static/image.png 查找文件并返回
+
+	//这里创建了一个 http.FileServer，它将使用 fs 来提供文件服务。
+	//然后，http.StripPrefix 用于创建一个新的 http.Handler，它会在处理请求之前从请求的 URL 中剥离掉 absolutePath。
+	//这样，当访问 /assets/image.png 时，
+	//http.StripPrefix 会去掉 /assets，然后 http.FileServer 会在 /static/image.png 处查找文件并返回。
 	return func(c *Context) {
 		file := c.Param("filepath")
 		// Check if file exists and/or if we have permission to access it
@@ -140,8 +146,14 @@ type Engine struct {
 
 func (engine *Engine) SetFuncMap(funcMap template.FuncMap) { //map[string]any
 	engine.funcMap = funcMap
+	//设置一个函数映射（funcMap），这个映射会在模板渲染时使用
 }
 
 func (engine *Engine) LoadHTMLGlob(pattern string) {
 	engine.htmlTemplates = template.Must(template.New("").Funcs(engine.funcMap).ParseGlob(pattern))
 }
+
+//template.New("")：创建一个新的模板，没有名称。
+//.Funcs(engine.funcMap)：将 funcMap 应用到模板中，这样模板就可以使用这些函数了。
+//.ParseGlob(pattern)：解析匹配 pattern 的所有模板文件。
+//template.Must：是一个辅助函数，用于处理模板解析过程中的错误。如果解析失败，它会触发 panic。

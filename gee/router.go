@@ -48,7 +48,7 @@ func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 }
 
 func (r *router) getRoute(method string, path string) (*node, map[string]string) {
-	searchParts := parsePattern(path)
+	searchParts := parsePattern(path) //请求的地址
 	params := make(map[string]string)
 	root, ok := r.roots[method]
 
@@ -59,7 +59,7 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 	n := root.search(searchParts, 0)
 
 	if n != nil {
-		parts := parsePattern(n.pattern)
+		parts := parsePattern(n.pattern) //服务器的地址
 		for index, part := range parts {
 			if part[0] == ':' {
 				params[part[1:]] = searchParts[index]
@@ -89,7 +89,7 @@ func (r *router) handle(c *Context) {
 	n, params := r.getRoute(c.Method, c.Path)
 
 	if n != nil {
-		key := c.Method + "-" + n.pattern
+		key := c.Method + "-" + n.pattern //当然要我们服务器端的地址，因为add路由时是我们服务器的地址
 		c.Params = params
 		c.handlers = append(c.handlers, r.handlers[key])
 	} else {
